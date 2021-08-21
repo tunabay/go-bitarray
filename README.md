@@ -44,7 +44,7 @@ func main() {
 	fmt.Println(ba4) // 1111000
 }
 ```
-[Run in Go Playground](https://play.golang.org/)
+[Run in Go Playground](https://play.golang.org/p/qm4fpMCPdWa)
 
 ## Documentation and examples:
 
