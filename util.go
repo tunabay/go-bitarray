@@ -351,7 +351,7 @@ func asUint64Slice(b []byte) []uint64 {
 	// h.Data, h.Len, h.Cap = uintptr(unsafe.Pointer(&b[0])), n, n
 
 	// Since go1.17
-	// nolint:typecheck // 2021-08-21: v1.42.0 does not support go1.17?
+	//nolint:typecheck // 2021-08-21: v1.42.0 does not support go1.17?
 	s := unsafe.Slice((*uint64)(unsafe.Pointer(&b[0])), (len(b)+7)>>3)
 
 	return s
