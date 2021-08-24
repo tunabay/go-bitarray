@@ -240,6 +240,13 @@ func (ba *BitArray) BitAt(off int) byte {
 // single byte 0xf0. In order to prevent these from being mapped to the same
 // hash value, the hash is calculated after appending a 3 bits marker
 // indicating the number of padding LSBs at the end of the original bit array.
+//
+// Deprecated: Most hash functions can handle bit-oriented messages as-is by
+// design, and it is not appropriate to use the byte-oriented standard hash.Hash
+// with padding bits. The result does not comply with the specifications. Not
+// all hash functions are available, but for SHA-1 and SHA-2, which can handle
+// bit-oriented messages correctly, dedicated methods such as SHA512, SHA256,
+// and SHA1 are now available. It is better to use them instead.
 func (ba *BitArray) Hash(h hash.Hash) []byte {
 	b, _ := ba.MarshalBinary()
 	h.Write(b)
