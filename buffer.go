@@ -89,6 +89,10 @@ func (buf Buffer) String() string {
 // bits in the new range to be extended are initialized with 0. When shrinking,
 // the extra bits are truncated. In either case, the align specifies whether to
 // fix the MSBs or the LSBs.
+//
+// Resize always reallocates internal memory. That is, the buffers created by
+// Slice method break their relationship with the parent buffer by calling this
+// Resize, even if nBits is equivalent to its current size.
 func (buf *Buffer) Resize(nBits int, align Alignment) {
 	switch {
 	case nBits < 0:
