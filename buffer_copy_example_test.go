@@ -43,3 +43,47 @@ func ExampleBuffer_CopyBitsToBytes() {
 	// [11001010 00010000 00000000]
 	// [11001010 00010000 10101010]
 }
+
+func ExampleCopyBits() {
+	ba := bitarray.MustParse("1100-1010 0001")
+	bufSrc := bitarray.NewBufferFromBitArray(ba)
+	bufDstL := bitarray.NewBuffer(18)
+	bufDstS := bitarray.NewBuffer(7)
+
+	bitarray.CopyBits(bufDstL, bufSrc)
+	fmt.Println(bufDstL)
+	bitarray.CopyBits(bufDstS, bufSrc)
+	fmt.Println(bufDstS)
+
+	// Output:
+	// 110010100001000000
+	// 1100101
+}
+
+func ExampleCopyBitsN() {
+	ba := bitarray.MustParse("1100-1010 1111")
+	bufSrc := bitarray.NewBufferFromBitArray(ba)
+	bufDstL := bitarray.NewBuffer(18)
+	bufDstS := bitarray.NewBuffer(7)
+
+	bitarray.CopyBitsN(bufDstL, bufSrc, 10)
+	fmt.Println(bufDstL)
+	bitarray.CopyBitsN(bufDstS, bufSrc, 10)
+	fmt.Println(bufDstS)
+
+	// Output:
+	// 110010101100000000
+	// 1100101
+}
+
+func ExampleCopyBitsPartial() {
+	ba := bitarray.MustParse("1101-1110 0011")
+	bufSrc := bitarray.NewBufferFromBitArray(ba)
+	bufDst := bitarray.NewBuffer(18)
+
+	bitarray.CopyBitsPartial(bufDst, bufSrc, 10, 3, 4)
+	fmt.Println(bufDst)
+
+	// Output:
+	// 000000000011110000
+}
