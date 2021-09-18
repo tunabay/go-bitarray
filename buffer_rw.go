@@ -117,12 +117,7 @@ func (buf *Buffer) BytesAt(off, nBytes int) []byte {
 		return []byte{}
 	}
 	ret := make([]byte, nBytes)
-	i, f := off>>3, off&7
-	if f == 0 {
-		copy(ret, buf.b[i:])
-	} else {
-		copyBits(ret, buf.b[i:], 0, f, nBits)
-	}
+	copyBits(ret, buf.b, 0, off, nBits)
 
 	return ret
 }
@@ -140,10 +135,5 @@ func (buf *Buffer) PutBytesAt(off int, b []byte) {
 	case len(b) == 0:
 		return
 	}
-	i, f := off>>3, off&7
-	if f == 0 {
-		copy(buf.b[i:], b)
-	} else {
-		copyBits(buf.b[i:], b, f, 0, nBits)
-	}
+	copyBits(buf.b, b, off, 0, nBits)
 }
