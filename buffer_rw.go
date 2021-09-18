@@ -14,6 +14,7 @@ func (buf *Buffer) BitAt(off int) byte {
 		panicf("BitAt: out of range: off=%d >= len=%d.", off, buf.nBits)
 	}
 
+	off += buf.off
 	return buf.b[off>>3] >> (7 - off&7) & 1
 }
 
@@ -26,6 +27,8 @@ func (buf *Buffer) PutBitAt(off int, bit byte) {
 	case buf.nBits <= off:
 		panicf("PutBitAt: out of range: off=%d >= len=%d.", off, buf.nBits)
 	}
+
+	off += buf.off
 	buf.b[off>>3] = buf.b[off>>3] & ^(byte(0x80)>>(off&7)) | ((bit & 1) << (7 - off&7))
 }
 
@@ -42,7 +45,7 @@ func (buf *Buffer) BitArrayAt(off, nBits int) *BitArray {
 		return zeroBitArray
 	}
 
-	return NewFromBytes(buf.b, off, nBits)
+	return NewFromBytes(buf.b, buf.off+off, nBits)
 }
 
 // PutBitArrayAt writes bits from a BitArray onto the specified offset off.
@@ -60,10 +63,10 @@ func (buf *Buffer) PutBitArrayAt(off int, ba BitArrayer) {
 	case bab.IsZero():
 		return
 	case bab.b == nil:
-		clearBits(buf.b, off, bab.nBits)
+		clearBits(buf.b, buf.off+off, bab.nBits)
 		return
 	}
-	_ = copyBits(buf.b, bab.b, off, 0, bab.nBits)
+	_ = copyBits(buf.b, bab.b, buf.off+off, 0, bab.nBits)
 }
 
 // ByteAt reads 8 bits starting at the offset off and returns them as a single
@@ -76,6 +79,7 @@ func (buf *Buffer) ByteAt(off int) byte {
 	case buf.nBits < off+8:
 		panicf("ByteAt: out of range: off=%d + 8 > len=%d.", off, buf.nBits)
 	}
+	off += buf.off
 	i, f := off>>3, off&7
 	if f == 0 {
 		return buf.b[i]
@@ -93,12 +97,7 @@ func (buf *Buffer) PutByteAt(off int, b byte) {
 	case buf.nBits < off+8:
 		panicf("PutByteAt: out of range: off=%d + 8 > len=%d.", off, buf.nBits)
 	}
-	i, f := off>>3, off&7
-	if f == 0 {
-		buf.b[i] = b
-	} else {
-		copyBits(buf.b[i:], []byte{b}, f, 0, 8) // TODO: optimize
-	}
+	copyBits(buf.b, []byte{b}, buf.off+off, 0, 8)
 }
 
 // BytesAt reads 8 * nBytes bits starting at the offset off and returns them as
@@ -117,7 +116,7 @@ func (buf *Buffer) BytesAt(off, nBytes int) []byte {
 		return []byte{}
 	}
 	ret := make([]byte, nBytes)
-	copyBits(ret, buf.b, 0, off, nBits)
+	copyBits(ret, buf.b, 0, buf.off+off, nBits)
 
 	return ret
 }
@@ -135,5 +134,5 @@ func (buf *Buffer) PutBytesAt(off int, b []byte) {
 	case len(b) == 0:
 		return
 	}
-	copyBits(buf.b, b, off, 0, nBits)
+	copyBits(buf.b, b, buf.off+off, 0, nBits)
 }

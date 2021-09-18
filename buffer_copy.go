@@ -15,7 +15,7 @@ func (buf *Buffer) CopyBitsFromBytes(off int, b []byte, bOff, nBits int) {
 	case nBits == 0:
 		return
 	}
-	copyBits(buf.b, b, off, bOff, nBits)
+	copyBits(buf.b, b, buf.off+off, bOff, nBits)
 }
 
 // CopyBitsToBytes reads nBits bits of the buffer starting at the offset off,
@@ -29,7 +29,7 @@ func (buf *Buffer) CopyBitsToBytes(off int, b []byte, bOff, nBits int) {
 	case nBits == 0:
 		return
 	}
-	copyBits(b, buf.b, bOff, off, nBits)
+	copyBits(b, buf.b, bOff, buf.off+off, nBits)
 }
 
 // CopyBits copies bits from src into dst. CopyBits returns the number of bits
@@ -40,7 +40,7 @@ func CopyBits(dst, src *Buffer) int {
 		nBits = sLen
 	}
 	if nBits != 0 {
-		copyBits(dst.b, src.b, 0, 0, nBits)
+		copyBits(dst.b, src.b, dst.off, src.off, nBits)
 	}
 
 	return nBits
@@ -55,7 +55,7 @@ func CopyBitsN(dst, src *Buffer, nBits int) int {
 		nBits = sLen
 	}
 	if nBits != 0 {
-		copyBits(dst.b, src.b, 0, 0, nBits)
+		copyBits(dst.b, src.b, dst.off, src.off, nBits)
 	}
 
 	return nBits
@@ -71,7 +71,7 @@ func CopyBitsPartial(dst, src *Buffer, dstOff, srcOff, nBits int) int {
 		nBits = sLen
 	}
 	if nBits != 0 {
-		copyBits(dst.b, src.b, dstOff, srcOff, nBits)
+		copyBits(dst.b, src.b, dst.off+dstOff, src.off+srcOff, nBits)
 	}
 
 	return nBits
