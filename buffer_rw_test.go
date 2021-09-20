@@ -282,6 +282,94 @@ func TestBuffer_PutByteAt(t *testing.T) {
 	chkpanic(0, 0)
 }
 
+func TestBuffer_RawBytes(t *testing.T) {
+	chk := func(buf *bitarray.Buffer, want ...byte) {
+		t.Helper()
+		got := buf.RawBytes()
+		if !bytes.Equal(got, want) {
+			t.Error("unexpected RawBytes():")
+			t.Logf(" got: %08b", got)
+			t.Logf("want: %08b", want)
+			t.Logf(" buf: %s", buf.D())
+		}
+	}
+
+	ba := bitarray.MustParse("1100-1111 0000-1010 1100-1110 0011-01")
+	buf := bitarray.NewBufferFromBitArray(ba)
+	chk(
+		buf,
+		0b_1100_1111, 0b_0000_1010, 0b_1100_1110, 0b_0011_0100,
+	)
+	chk(
+		buf.Slice(0, 17),
+		0b_1100_1111, 0b_0000_1010, 0b_1100_1110,
+	)
+	chk(
+		buf.Slice(4, 28),
+		0b_1111_0000, 0b_1010_1100, 0b_1110_0011,
+	)
+	chk(
+		buf.Slice(4, 24),
+		0b_1111_0000, 0b_1010_1100, 0b_1110_0000,
+	)
+	chk(
+		buf.Slice(4, 24).SliceToEnd(4),
+		0b_0000_1010, 0b_1100_1110,
+	)
+	chk(
+		buf.Slice(4, 24).Slice(4, 16),
+		0b_0000_1010, 0b_1100_1110,
+	)
+	chk(
+		buf.Slice(4, 24).SliceToEnd(6),
+		0b_0010_1011, 0b_0011_1000,
+	)
+}
+
+func TestBuffer_Bytes(t *testing.T) {
+	chk := func(buf *bitarray.Buffer, want ...byte) {
+		t.Helper()
+		got := buf.Bytes()
+		if !bytes.Equal(got, want) {
+			t.Error("unexpected Bytes():")
+			t.Logf(" got: %08b", got)
+			t.Logf("want: %08b", want)
+			t.Logf(" buf: %s", buf.D())
+		}
+	}
+
+	ba := bitarray.MustParse("1100-1111 0000-1010 1100-1110 0011-01")
+	buf := bitarray.NewBufferFromBitArray(ba)
+	chk(
+		buf,
+		0b_1100_1111, 0b_0000_1010, 0b_1100_1110, 0b_0011_0100,
+	)
+	chk(
+		buf.Slice(0, 17),
+		0b_1100_1111, 0b_0000_1010, 0b_1000_0000,
+	)
+	chk(
+		buf.Slice(4, 28),
+		0b_1111_0000, 0b_1010_1100, 0b_1110_0011,
+	)
+	chk(
+		buf.Slice(4, 24),
+		0b_1111_0000, 0b_1010_1100, 0b_1110_0000,
+	)
+	chk(
+		buf.Slice(4, 24).SliceToEnd(4),
+		0b_0000_1010, 0b_1100_1110,
+	)
+	chk(
+		buf.Slice(4, 24).Slice(4, 16),
+		0b_0000_1010, 0b_1100_0000,
+	)
+	chk(
+		buf.Slice(4, 24).SliceToEnd(6),
+		0b_0010_1011, 0b_0011_1000,
+	)
+}
+
 func TestBuffer_BytesAt(t *testing.T) {
 	buf := bitarray.NewBuffer(30)
 	chk := func(off, nBytes int, want ...byte) {

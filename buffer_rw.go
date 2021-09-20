@@ -100,6 +100,28 @@ func (buf *Buffer) PutByteAt(off int, b byte) {
 	copyBits(buf.b, []byte{b}, buf.off+off, 0, 8)
 }
 
+// RawBytes returns all the bits of the buffer as a byte slice. The caller must
+// not change the contents of the returned byte slice. The slice returned may or
+// may not reference to the internal buffer itself of buf, depending on whether
+// bit-shifting is needed of not. Also, if buf.Len() is not a multiple of 8, the
+// bits after the last bit in the slice returned are undefined. The main purpose
+// of RawBytes is to efficiently pass bit data to other byte-oriented APIs. In
+// general, it is recommended to use the safer Bytes() instead.
+func (buf *Buffer) RawBytes() []byte {
+	if buf.off&7 == 0 {
+		return buf.b[buf.off>>3 : (buf.off+buf.nBits+7)>>3]
+	}
+	return buf.Bytes()
+}
+
+// Bytes returns all the bits of the buffer as a byte slice. If buf.Len() is not
+// a multiple of 8, it will be padded with 0.
+func (buf *Buffer) Bytes() []byte {
+	b := make([]byte, (buf.nBits+7)>>3)
+	copyBits(b, buf.b, 0, buf.off, buf.nBits)
+	return b
+}
+
 // BytesAt reads 8 * nBytes bits starting at the offset off and returns them as
 // a byte slice. Note that off is in bits, not bytes. If the off is not a
 // multiple of 8, it returns a properly shifted byte slice.
