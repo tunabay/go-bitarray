@@ -47,6 +47,33 @@ func NewBufferFromBitArray(ba BitArrayer) *Buffer {
 	return buf
 }
 
+// NewBufferFromByteSlice creates a new Buffer that references an existing byte
+// slice b. The created Buffer references b without copying it, therefore,
+// changes to the buffer affect b and vice versa.  The length of the buffer
+// created will be len(b) * 8. NewBufferFromByteSlice is useful when reading or
+// writing a subpart of a byte slice as a bit array without copying or
+// bit-shifting.
+func NewBufferFromByteSlice(b []byte) *Buffer {
+	return NewBufferFromByteSlicePartial(b, 0, len(b)<<3)
+}
+
+// NewBufferFromByteSlicePartial is identical to NewBufferFromByteSlice except
+// that it creates a buffer with the first bit specified by off, and the length
+// specified by nBits.
+func NewBufferFromByteSlicePartial(b []byte, off, nBits int) *Buffer {
+	switch {
+	case off < 0:
+		panicf("NewBufferFromByteSlice: negative off %d.", nBits)
+	case nBits < 0:
+		panicf("NewBufferFromByteSlice: negative nBits %d.", nBits)
+	case len(b)<<3 < off+nBits:
+		panicf("NewBufferFromByteSlice: out of range: off=%d, nBits=%d > len=%d.", off, nBits, len(b))
+	case nBits == 0:
+		return &Buffer{}
+	}
+	return &Buffer{b: b[off>>3:], nBits: nBits, off: off & 7}
+}
+
 // IsZero returns whether the Buffer is zero length.
 func (buf *Buffer) IsZero() bool {
 	return buf.Len() == 0
