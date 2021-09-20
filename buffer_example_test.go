@@ -95,3 +95,13 @@ func ExampleBuffer_Len() {
 	// Output:
 	// 4096
 }
+
+func ExampleBuffer_FillBits() {
+	buf := bitarray.NewBuffer(12)
+
+	buf.Slice(5, 10).FillBits(1)
+	fmt.Printf("% b\n", buf)
+
+	// Output:
+	// 00000111 1100
+}

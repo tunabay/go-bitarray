@@ -158,6 +158,11 @@ func (buf *Buffer) Resize(nBits int, align Alignment) {
 	buf.off = 0
 }
 
+// FillBits sets all the bits in the buffer to the value bit, 0 or 1.
+func (buf *Buffer) FillBits(bit byte) {
+	buf.FillBitsAt(0, buf.nBits, bit)
+}
+
 // FillBitsAt sets the nBits bits starting at off to the value bit.
 func (buf *Buffer) FillBitsAt(off, nBits int, bit byte) {
 	switch {
