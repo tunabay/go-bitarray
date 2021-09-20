@@ -13,7 +13,7 @@ func (buf *Buffer) D() string {
 	if buf == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("BUF{nbit=%d, b=%08b}", buf.nBits, buf.b)
+	return fmt.Sprintf("BUF{nbit=%d, off=%d, b=%08b}", buf.nBits, buf.off, buf.b)
 }
 
 // V validate the internal data representation. It panics on failure.
@@ -34,17 +34,14 @@ func (buf *Buffer) V() {
 	case buf.b == nil:
 		return
 
-	case len(buf.b) != (buf.nBits+7)>>3:
-		panicf("V: wrong len: len=%d, nBits=%d: %08b", len(buf.b), buf.nBits, buf.b)
+	case buf.off < 0:
+		panicf("V: negative off %d", buf.off)
 
-		// case cap(buf.b)&7 != 0:
-		// 	panicf("V: wrong cap: cap=%d, len=%d, nBits=%d", cap(buf.b), len(buf.b), buf.nBits)
-	}
-
-	if fb := buf.nBits & 7; fb != 0 {
-		mask := byte(0xff) >> fb
-		if lb := buf.b[len(buf.b)-1] & mask; lb != 0 {
-			panicf("V: non-zero padding bits: nfrac=%d, lastbyte=%08b", fb, lb)
-		}
+	case len(buf.b) < (buf.off+buf.nBits+7)>>3:
+		panicf(
+			"V: short buf: off=%d, nBits=%d, reqB=%d, lenB=%d: %08b",
+			buf.off, buf.nBits, (buf.off+buf.nBits+7)>>3, len(buf.b),
+			buf.b,
+		)
 	}
 }

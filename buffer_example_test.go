@@ -58,6 +58,35 @@ func ExampleNewBufferFromBitArray() {
 	// 111111110000000011111111
 }
 
+func ExampleNewBufferFromByteSlice() {
+	b := []byte{0b_0000_1111, 0b_1111_0000}
+	buf := bitarray.NewBufferFromByteSlice(b)
+
+	fmt.Printf("b=%08b, buf=% b\n", b, buf)
+	buf.PutBitAt(0, 1)
+	buf.PutBitAt(15, 1)
+	fmt.Printf("b=%08b, buf=% b\n", b, buf)
+
+	// Output:
+	// b=[00001111 11110000], buf=00001111 11110000
+	// b=[10001111 11110001], buf=10001111 11110001
+}
+
+func ExampleNewBufferFromByteSlicePartial() {
+	b := []byte{0b_0000_1111, 0b_1111_0000}
+	buf := bitarray.NewBufferFromByteSlicePartial(b, 4, 6)
+
+	fmt.Printf("b=%08b, buf=%b\n", b, buf)
+	buf.PutBitAt(0, 0)
+	buf.PutBitAt(1, 0)
+	buf.PutBitAt(5, 0)
+	fmt.Printf("b=%08b, buf=%b\n", b, buf)
+
+	// Output:
+	// b=[00001111 11110000], buf=111111
+	// b=[00000011 10110000], buf=001110
+}
+
 func ExampleBuffer_Len() {
 	buf := bitarray.NewBuffer(4096)
 
@@ -65,4 +94,14 @@ func ExampleBuffer_Len() {
 
 	// Output:
 	// 4096
+}
+
+func ExampleBuffer_FillBits() {
+	buf := bitarray.NewBuffer(12)
+
+	buf.Slice(5, 10).FillBits(1)
+	fmt.Printf("% b\n", buf)
+
+	// Output:
+	// 00000111 1100
 }

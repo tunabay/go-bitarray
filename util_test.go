@@ -15,7 +15,7 @@ import (
 	"github.com/tunabay/go-bitarray"
 )
 
-func TestCopyBits(t *testing.T) {
+func TestCopyBitsB(t *testing.T) {
 	test := func(
 		dst, src []byte,
 		dstOff, srcOff, nBits int,
@@ -24,7 +24,7 @@ func TestCopyBits(t *testing.T) {
 		t.Helper()
 		org := make([]byte, len(dst))
 		copy(org, dst)
-		bitarray.CopyBits(dst, src, dstOff, srcOff, nBits)
+		bitarray.CopyBitsB(dst, src, dstOff, srcOff, nBits)
 		if !bytes.Equal(dst, exp) {
 			t.Error("unexpected result:")
 			t.Logf("dstOff=%d, srcOff=%d, nBits=%d", dstOff, srcOff, nBits)
@@ -109,7 +109,7 @@ func sfmt(s string) string {
 	return fmt.Sprintf("[%s]", strings.Join(f, " "))
 }
 
-func TestCopyBits_rand(t *testing.T) {
+func TestCopyBitsB_rand(t *testing.T) {
 	const testIterations = 50000
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < testIterations; i++ {
@@ -128,7 +128,7 @@ func TestCopyBits_rand(t *testing.T) {
 
 		subpS := srcS[src0 : src0+nBits]
 		wantS := orgS[:dst0] + subpS + orgS[dst0+nBits:]
-		gotZF := bitarray.CopyBits(dstB, srcB, dst0, src0, nBits)
+		gotZF := bitarray.CopyBitsB(dstB, srcB, dst0, src0, nBits)
 		dstS = mkBitsStr(dstB)
 
 		if gotZF && strings.Contains(subpS, "1") {

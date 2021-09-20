@@ -94,6 +94,32 @@ func ExampleBuffer_PutByteAt() {
 	// 00111100000000
 }
 
+func ExampleBuffer_RawBytes() {
+	ba := bitarray.MustParse("1111-0000 1010-1010 1111-1111 11")
+	buf := bitarray.NewBufferFromBitArray(ba)
+
+	// not byte-aligned, copied, 0-padded
+	fmt.Printf("%08b\n", buf.Slice(3, 24).RawBytes())
+	// byte-aligned, not copied, not 0-padded
+	fmt.Printf("%08b\n", buf.Slice(3, 24).Slice(5, 16).RawBytes())
+
+	// Output:
+	// [10000101 01010111 11111000]
+	// [10101010 11111111]
+}
+
+func ExampleBuffer_Bytes() {
+	ba := bitarray.MustParse("1100-1010 1010-1111 0101-11")
+	buf := bitarray.NewBufferFromBitArray(ba)
+
+	fmt.Printf("%08b\n", buf.Bytes())
+	fmt.Printf("%08b\n", buf.Slice(4, 20).Bytes())
+
+	// Output:
+	// [11001010 10101111 01011100]
+	// [10101010 11110101]
+}
+
 func ExampleBuffer_BytesAt() {
 	ba := bitarray.MustParse("1100-1010 0011-1111 1010-0000 0111-1000")
 	buf := bitarray.NewBufferFromBitArray(ba)

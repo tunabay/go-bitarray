@@ -4,10 +4,6 @@
 
 package bitarray
 
-import (
-	"math/bits"
-)
-
 // ToggleBitAt flips a single bit at the position specified by off in the
 // buffer.
 func (buf *Buffer) ToggleBitAt(off int) {
@@ -16,9 +12,9 @@ func (buf *Buffer) ToggleBitAt(off int) {
 		panicf("ToggleBitAt: negative off %d.", off)
 	case buf.nBits <= off:
 		panicf("ToggleBitAt: out of range: off=%d >= len=%d.", off, buf.nBits)
-	default:
-		buf.b[off>>3] ^= byte(0x80) >> (off & 7)
 	}
+	off += buf.off
+	buf.b[off>>3] ^= byte(0x80) >> (off & 7)
 }
 
 // ToggleBitsAt inverts the nBits bits starting at off.
@@ -33,7 +29,7 @@ func (buf *Buffer) ToggleBitsAt(off, nBits int) {
 	case nBits == 0:
 		// no-op
 	default:
-		toggleBits(buf.b, off, nBits)
+		toggleBits(buf.b, buf.off+off, nBits)
 	}
 }
 
@@ -53,9 +49,9 @@ func (buf *Buffer) AndAt(off int, x BitArrayer) {
 	case bax.IsZero():
 		// no-op
 	case bax.b == nil:
-		clearBits(buf.b, off, bax.nBits)
+		clearBits(buf.b, buf.off+off, bax.nBits)
 	default:
-		andBits(buf.b, bax.b, off, 0, bax.nBits)
+		andBits(buf.b, bax.b, buf.off+off, 0, bax.nBits)
 	}
 }
 
@@ -74,7 +70,7 @@ func (buf *Buffer) OrAt(off int, x BitArrayer) {
 	case bax.IsZero(), bax.b == nil:
 		// no-op
 	default:
-		orBits(buf.b, bax.b, off, 0, bax.nBits)
+		orBits(buf.b, bax.b, buf.off+off, 0, bax.nBits)
 	}
 }
 
@@ -94,25 +90,15 @@ func (buf *Buffer) XorAt(off int, x BitArrayer) {
 	case bax.IsZero(), bax.b == nil:
 		// no-op
 	default:
-		xorBits(buf.b, bax.b, off, 0, bax.nBits)
+		xorBits(buf.b, bax.b, buf.off+off, 0, bax.nBits)
 	}
 }
 
 // LeadingZeros returns the number of leading zero bits in the Buffer.
-func (buf *Buffer) LeadingZeros() int { return (*BitArray)(buf).LeadingZeros() }
+func (buf *Buffer) LeadingZeros() int { return buf.BitArray().LeadingZeros() }
 
 // TrailingZeros returns the number of trailing zero bits in the Buffer.
-func (buf *Buffer) TrailingZeros() int { return (*BitArray)(buf).TrailingZeros() }
+func (buf *Buffer) TrailingZeros() int { return buf.BitArray().TrailingZeros() }
 
 // OnesCount returns the number of one bits, population count, in the Buffer.
-func (buf *Buffer) OnesCount() int {
-	if buf.IsZero() {
-		return 0
-	}
-	n := 0
-	for _, b := range buf.b {
-		n += bits.OnesCount8(b)
-	}
-
-	return n
-}
+func (buf *Buffer) OnesCount() int { return buf.BitArray().OnesCount() }

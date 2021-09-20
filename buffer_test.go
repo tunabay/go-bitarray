@@ -90,6 +90,82 @@ func TestNewBufferFromBitArray(t *testing.T) {
 	}
 }
 
+func TestNewBufferFromByteSlicePartial(t *testing.T) {
+	dat := []byte{0b_1111_0000, 0b_1010_0101, 0b_1100_0011, 0b_0101_1010}
+	chk := func(off, nBits int, wantS string) {
+		want := bitarray.MustParse(wantS)
+		buf := bitarray.NewBufferFromByteSlicePartial(dat, off, nBits)
+		buf.V()
+		if ba := buf.BitArray(); !ba.Equal(want) {
+			t.Error("unexpected buffer:")
+			t.Logf(" got: %# b", ba)
+			t.Logf("want: %# b", want)
+			t.Logf(" buf: %s", buf.D())
+		}
+	}
+	chk(0, 0, "")
+	chk(0, 1, "1")
+	chk(0, 4, "1111")
+	chk(0, 7, "1111-000")
+	chk(0, 8, "1111-0000")
+	chk(0, 9, "1111-0000 1")
+	chk(0, 15, "1111-0000 1010-010")
+	chk(0, 16, "1111-0000 1010-0101")
+	chk(0, 17, "1111-0000 1010-0101 1")
+	chk(0, 32, "1111-0000 1010-0101 1100-0011 0101-1010")
+	chk(1, 4, "111-0")
+	chk(2, 4, "11-00")
+	chk(3, 4, "1-000")
+	chk(4, 4, "0000")
+	chk(4, 6, "0000 10")
+	chk(5, 5, "000 10")
+	chk(6, 4, "00 10")
+	chk(7, 0, "")
+	chk(7, 1, "0")
+	chk(7, 2, "0 1")
+	chk(7, 4, "0 101")
+	chk(7, 7, "0 1010-01")
+	chk(7, 8, "0 1010-010")
+	chk(7, 9, "0 1010-0101")
+	chk(7, 10, "0 1010-0101 1")
+	chk(7, 15, "0 1010-0101 1100-00")
+	chk(7, 16, "0 1010-0101 1100-001")
+	chk(7, 17, "0 1010-0101 1100-0011")
+	chk(7, 18, "0 1010-0101 1100-0011 0")
+	chk(7, 24, "0 1010-0101 1100-0011 0101-101")
+	chk(7, 25, "0 1010-0101 1100-0011 0101-1010")
+	chk(8, 0, "")
+	chk(8, 1, "1")
+	chk(8, 4, "1010")
+	chk(8, 7, "1010-010")
+	chk(8, 8, "1010-0101")
+	chk(8, 9, "1010-0101 1")
+	chk(8, 15, "1010-0101 1100-001")
+	chk(8, 16, "1010-0101 1100-0011")
+	chk(8, 17, "1010-0101 1100-0011 0")
+	chk(31, 0, "")
+	chk(31, 1, "0")
+	chk(32, 0, "")
+	chkpanic := func(off, nBits int) {
+		var buf *bitarray.Buffer
+		defer func() {
+			if recover() == nil {
+				t.Errorf("panic expected: off=%d, nBits=%d", off, nBits)
+				t.Errorf("buf: %s", buf.D())
+			}
+		}()
+		buf = bitarray.NewBufferFromByteSlicePartial(dat, off, nBits)
+	}
+	chkpanic(-1, 4)
+	chkpanic(0, -1)
+	chkpanic(0, 33)
+	chkpanic(1, 32)
+	chkpanic(31, 2)
+	chkpanic(32, 1)
+	chkpanic(33, 0)
+	chkpanic(64, 4)
+}
+
 func TestBuffer_Len_edge(t *testing.T) {
 	var buf *bitarray.Buffer
 	if n := buf.Len(); n != 0 {

@@ -5,7 +5,7 @@
 package bitarray
 
 var (
-	CopyBits   = copyBits
+	CopyBitsB  = copyBits
 	ClearBits  = clearBits
 	SetBits    = setBits
 	ToggleBits = toggleBits

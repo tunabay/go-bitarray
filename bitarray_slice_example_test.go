@@ -20,6 +20,16 @@ func ExampleBitArray_Slice() {
 	// 1101
 }
 
+func ExampleBitArray_SliceToEnd() {
+	ba := bitarray.MustParse("0011-1010 01101")
+	fmt.Printf("% b\n", ba.SliceToEnd(4))
+	fmt.Printf("% b\n", ba.SliceToEnd(9))
+
+	// Output:
+	// 10100110 1
+	// 1101
+}
+
 func ExampleBitArray_ToWidth() {
 	ba := bitarray.MustParse("1010-1111 0000-11")
 	fmt.Printf("% s\n", ba.ToWidth(7, bitarray.AlignLeft))
