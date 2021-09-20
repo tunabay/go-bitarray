@@ -118,8 +118,9 @@ func (buf Buffer) String() string {
 // fix the MSBs or the LSBs.
 //
 // Resize always reallocates internal memory. That is, the buffers created by
-// Slice method break their relationship with the parent buffer by calling this
-// Resize, even if nBits is equivalent to its current size.
+// Slice method or NewBufferFromByteSlice break their relationship with the
+// parent buffer or slice by calling this Resize, even if nBits is equivalent to
+// or less than its current size.
 func (buf *Buffer) Resize(nBits int, align Alignment) {
 	switch {
 	case nBits < 0:
