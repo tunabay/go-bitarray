@@ -24,6 +24,18 @@ func ExampleBuffer_Slice() {
 	// 1101
 }
 
+func ExampleBuffer_SliceToEnd() {
+	ba := bitarray.MustParse("0011-1010 0110-1")
+	buf := bitarray.NewBufferFromBitArray(ba)
+
+	fmt.Println(buf.SliceToEnd(4))
+	fmt.Println(buf.SliceToEnd(9))
+
+	// Output:
+	// 101001101
+	// 1101
+}
+
 func ExampleBuffer_Slice_update() {
 	ba := bitarray.MustParse("1000-0000 0000-01")
 	buf := bitarray.NewBufferFromBitArray(ba)

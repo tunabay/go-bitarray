@@ -29,3 +29,7 @@ func (buf *Buffer) Slice(start, end int) *Buffer {
 	off := buf.off + start
 	return &Buffer{b: buf.b[off>>3:], nBits: end - start, off: off & 7}
 }
+
+// SliceToEnd is shorthand for Slice(start, buf.Len()) and returns the subpart
+// from the position specified start to the last bit.
+func (buf *Buffer) SliceToEnd(start int) *Buffer { return buf.Slice(start, buf.Len()) }

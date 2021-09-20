@@ -38,6 +38,10 @@ func (ba *BitArray) Slice(start, end int) *BitArray {
 	return &BitArray{b: buf, nBits: nBits}
 }
 
+// SliceToEnd is shorthand for Slice(start, ba.Len()) and returns the subpart
+// from the position specified start to the last bit.
+func (ba *BitArray) SliceToEnd(start int) *BitArray { return ba.Slice(start, ba.Len()) }
+
 // ToWidth returns a new BitArray resized to wid bits with its contents
 // preserved. If wid is less than ba.Len(), some bits will be lost. If wid is
 // greater than be.Len(), the expanded space will be filled with 0s. In both
