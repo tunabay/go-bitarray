@@ -92,10 +92,10 @@ func (buf *Buffer) Clone() *Buffer {
 	if buf.Len() == 0 {
 		return &Buffer{}
 	}
-	b := allocByteSlice((buf.nBits + 7) >> 3)
-	copyBits(b, buf.b, 0, buf.off, buf.nBits)
+	b := make([]byte, len(buf.b))
+	copy(b, buf.b)
 
-	return &Buffer{b: b, nBits: buf.nBits}
+	return &Buffer{b: b, nBits: buf.nBits, off: buf.off}
 }
 
 // BitArray creates an imuurable BitArray from the current content.
