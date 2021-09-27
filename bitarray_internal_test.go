@@ -31,9 +31,6 @@ func (ba *BitArray) V() {
 	case ba.b != nil && len(ba.b) == 0:
 		panicf("V: ba.b is an empty slice, must be nil: %08b", ba.b)
 
-	case ba.b == nil:
-		return
-
 	case len(ba.b) != (ba.nBits+7)>>3:
 		panicf("V: wrong len: len=%d, nBits=%d: %08b", len(ba.b), ba.nBits, ba.b)
 

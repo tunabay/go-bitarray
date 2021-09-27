@@ -184,7 +184,7 @@ func (ba *BitArray) NumPadding() int {
 }
 
 // String returns the string representation of the BitArray.
-func (ba BitArray) String() string {
+func (ba *BitArray) String() string {
 	if ba.IsZero() {
 		return ""
 	}
