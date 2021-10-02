@@ -12,6 +12,48 @@ import (
 	"github.com/tunabay/go-bitarray"
 )
 
+func Example_bitLayout() {
+	// This example assumes 8-byte data with the following bit layout, and
+	// accesses the 5-bit integer X and the 50-bit integer Y in it.
+	//
+	//   |0              |1              |2              |3              |
+	//   |0 1 2 3 4 5 6 7|0 1 2 3 4 5 6 7|0 1 2 3 4 5 6 7|0 1 2 3 4 5 6 7|
+	//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	//   | 9-bit flag area | 5-bit X | Upper 18 bits of the 50-bit int Y |
+	//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	//   |               Lower 32 bits of the 50-bit int Y               |
+	//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	data := make([]byte, 8)
+	buf := bitarray.NewBufferFromByteSlice(data)
+
+	// set 9-bit flag area to 110000011
+	buf.PutBitAt(0, 1)
+	buf.PutBitAt(1, 1)
+	buf.PutBitAt(7, 1)
+	buf.PutBitAt(8, 1)
+
+	// set 5-bit integer X
+	buf.Slice(9, 14).PutUint8(25) // = 0b_11001
+
+	// set 50-bit integer Y
+	buf.Slice(14, 64).PutUint64(0x_3_f0ff_f0f0_ff0f)
+
+	// raw bytes updated
+	fmt.Printf("%08b\n%08b\n", data[:4], data[4:])
+
+	// read fields
+	fmt.Printf("F = %b\n", buf.Slice(0, 9))
+	fmt.Printf("X = %d\n", buf.Slice(9, 14).Uint8())
+	fmt.Printf("Y = %x\n", buf.SliceToEnd(14).Uint64())
+
+	// Output:
+	// [11000001 11100111 11110000 11111111]
+	// [11110000 11110000 11111111 00001111]
+	// F = 110000011
+	// X = 25
+	// Y = 3f0fff0f0ff0f
+}
+
 func ExampleBitArray_usage() {
 	// Parse string representation
 	ba1, err := bitarray.Parse("111000")

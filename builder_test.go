@@ -472,3 +472,39 @@ func TestBuilder_WriteBitArray_multi(t *testing.T) {
 		t.Logf("want: %#b", wantB)
 	}
 }
+
+func TestBuilder_WriteBits(t *testing.T) {
+	srcBA := bitarray.MustParse("1111-0000 1100-0011").Repeat(10)
+	srcBuf := bitarray.NewBufferFromBitArray(srcBA)
+	wantS := ""
+	bb := bitarray.NewBuilder()
+
+	add := func(buf *bitarray.Buffer) {
+		t.Helper()
+		wantS += buf.String()
+		n, err := bb.WriteBits(buf)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if n != buf.Len() {
+			t.Fatalf("unexpected n: got %d, want %d", n, buf.Len())
+		}
+		if got, want := bb.BitArray(), bitarray.MustParse(wantS); !got.Equal(want) {
+			t.Errorf("unexpected result:")
+			t.Logf(" got: %#b", got)
+			t.Logf("want: %#b", want)
+		}
+	}
+	for i := 0; i < 35; i++ {
+		for j := 0; j < 35; j++ {
+			add(srcBuf.Slice(i, i+j))
+		}
+	}
+	srcBuf.FillBits(0)
+
+	if got, want := bb.BitArray(), bitarray.MustParse(wantS); !got.Equal(want) {
+		t.Errorf("unexpected result:")
+		t.Logf(" got: %#b", got)
+		t.Logf("want: %#b", want)
+	}
+}

@@ -208,11 +208,18 @@ func (b *Builder) WriteByteBits(bits []byte) {
 	b.append(buf, 0, len(bits), zfb == 0)
 }
 
-/*
-// WriteBits write the bits read from a Buffer p. It always returns p.Len() and
-// a nil error.
-func (b *Builder) WriteBits(p *Buffer) (int, error) {}
-*/
+// WriteBits write the bits read from a Buffer p. WriteBits copies p and is
+// unaffected by changes to p after the call. It always returns p.Len() and nil
+// error.
+func (b *Builder) WriteBits(p *Buffer) (int, error) {
+	if p.IsZero() {
+		return 0, nil
+	}
+	p = p.Clone()
+	b.append(p.b, p.off, p.nBits, false)
+
+	return p.nBits, nil
+}
 
 /*
 // Unwrite discards the last nBits bits of the bits already written. It is
