@@ -54,7 +54,7 @@ func Example_bitLayout() {
 	// Y = 3f0fff0f0ff0f
 }
 
-func ExampleBitArray_usage() {
+func Example_bitArray() {
 	// Parse string representation
 	ba1, err := bitarray.Parse("111000")
 	if err != nil {
