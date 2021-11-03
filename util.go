@@ -6,7 +6,6 @@ package bitarray
 
 import (
 	"fmt"
-	"reflect"
 	"unsafe"
 )
 
@@ -344,18 +343,7 @@ func allocByteSlice(nBytes int) []byte {
 }
 
 func asUint64Slice(b []byte) []uint64 {
-	// s := (*[cap(b)>>3]uint64)(unsafe.Pointer(&b[0]))[:]
-
-	n := (len(b) + 7) >> 3
-	s := make([]uint64, 0)
-	h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
-	h.Data, h.Len, h.Cap = uintptr(unsafe.Pointer(&b[0])), n, n
-
-	// Since go1.17
-	// 2021-08-21: golangcilint v1.42.0 does not support go1.17?
-	// s := unsafe.Slice((*uint64)(unsafe.Pointer(&b[0])), (len(b)+7)>>3)
-
-	return s
+	return unsafe.Slice((*uint64)(unsafe.Pointer(&b[0])), (len(b)+7)>>3)
 }
 
 func fill00(b []byte) {
