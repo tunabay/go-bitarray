@@ -34,7 +34,7 @@ func ExampleBitArray_SHA384() {
 	// c6b08368812f4f02aaf84c1b8fcd549f53099816b212fe68cb32f6d73563fae8cec52b96051ade12ba8f3c6a6e98a616
 }
 
-func ExampleBitArray_SHA512_256() {
+func ExampleBitArray_SHA512_256() { //nolint: govet // false positive for _256 suffix
 	ba1 := bitarray.MustParse("0000")
 	ba2 := bitarray.MustParse("00000")
 
